@@ -10,13 +10,11 @@ use Guzzle\Http\Client;
 
 class OAuth2UserProvider implements UserProviderInterface
 {
-    private $client;
-    private $verify_path;
+    private $verify_endpoint;
 
-    public function __construct($server_uri, $verify_path)
+    public function __construct($verify_endpoint)
     {
-        $this->client = new Client($server_uri);
-        $this->verify_path = $verify_path;
+        $this->verify_endpoint = $verify_endpoint;
     }
 
     public function loadUserByUsername($username)
@@ -27,8 +25,9 @@ class OAuth2UserProvider implements UserProviderInterface
     public function loadUserByAccessToken($access_token)
     {
         // Verify Access Token and get details back
-        $request = $this->client->get(
-            $this->verify_path,
+        $client = new Client();
+        $request = $client->get(
+            $this->verify_endpoint,
             array(
                 'Authorization' => 'Bearer ' . $access_token
             ),

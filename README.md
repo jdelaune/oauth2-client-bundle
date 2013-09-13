@@ -53,8 +53,7 @@ You'll need to two parameters to your parameters.yml
 # app/config/parameters.yml
 
 parameters:
-    oauth2.client.server.uri:           https://example.com
-    oauth2.client.server.verify_path:   '/verify'
+    oauth2.client.server.verify_endpoint: 'https://example.com/verify'
 ```
 
 The verify path should verify the access token on your OAuth2 Server and provide a JSON encoded array of:

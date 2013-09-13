@@ -12,7 +12,6 @@ use OAuth2\ClientBundle\Security\Authentication\Token\OAuth2AccessToken;
 class OAuth2Provider implements AuthenticationProviderInterface
 {
     private $userProvider;
-    private $cacheDir;
 
     public function __construct(UserProviderInterface $userProvider)
     {
