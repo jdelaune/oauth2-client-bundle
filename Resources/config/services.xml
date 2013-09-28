@@ -3,21 +3,38 @@
     <parameters>
         <parameter key="oauth2.client.security.authentication.provider.class">OAuth2\ClientBundle\Security\Authentication\Provider\OAuth2Provider</parameter>
         <parameter key="oauth2.client.security.authentication.listener.class">OAuth2\ClientBundle\Security\Firewall\OAuth2Listener</parameter>
+        <parameter key="oauth2.client.security.entry_point.access_token_entry_point.class">OAuth2\ClientBundle\Security\EntryPoint\OAuth2AccessTokenEntryPoint</parameter>
+        <parameter key="oauth2.client.security.entry_point.authorization_code_entry_point.class">OAuth2\ClientBundle\Security\EntryPoint\OAuth2AuthorizationCodeEntryPoint</parameter>
         <parameter key="oauth2.client.user_provider.class">OAuth2\ClientBundle\Security\User\OAuth2UserProvider</parameter>
-        <parameter key="oauth2.client.server.verify_endpoint">https://www.example.com/verify</parameter>
+        <parameter key="oauth2.client.server" type="collection">
+            <parameter key="verify_uri">https://www.example.com/verify</parameter>
+            <parameter key="authorize_uri">https://www.example.com/authorize</parameter>
+            <parameter key="token_uri">https://www.example.com/token</parameter>
+        </parameter>
     </parameters>
     <services>
         <service id="oauth2.client.user_provider" class="%oauth2.client.user_provider.class%">
-            <argument>%oauth2.client.server.verify_endpoint%</argument>
+            <argument>%oauth2.client.server%</argument>
         </service>
 
         <service id="oauth2.client.security.authentication.provider" class="%oauth2.client.security.authentication.provider.class%" public="false">
             <argument />
         </service>
 
-        <service id="oauth2.client.security.authentication.listener" class="%oauth2.client.security.authentication.listener.class%" public="false">
-            <argument type="service" id="security.context"/>
-            <argument type="service" id="security.authentication.manager" />
+        <service id="oauth2.client.security.authentication.listener" class="%oauth2.client.security.authentication.listener.class%" parent="security.authentication.listener.abstract" public="false" abstract="true">
+            <call method="setServer">
+                <argument>%oauth2.client.server%</argument>
+            </call>
+        </service>
+
+        <service id="oauth2.client.security.entry_point.authorization_code_entry_point" class="%oauth2.client.security.entry_point.authorization_code_entry_point.class%" public="false">
+            <argument>%oauth2.client.server%</argument>
+            <argument />
+        </service>
+
+        <service id="oauth2.client.security.entry_point.access_token_entry_point" class="%oauth2.client.security.entry_point.access_token_entry_point.class%" public="false">
+            <argument>%oauth2.client.server%</argument>
+            <argument />
         </service>
     </services>
 </container>

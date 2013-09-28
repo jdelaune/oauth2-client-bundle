@@ -7,20 +7,16 @@ use Symfony\Component\Security\Core\User\EquatableInterface;
 
 class OAuth2User implements UserInterface, EquatableInterface
 {
-    private $access_token;
+    private $client_id;
     private $user_id;
     private $scopes;
-    private $client_id;
-    private $type;
-    private $expires;
+    private $access_token;
 
-    public function __construct($access_token, $client_id, $user_id = NULL, \DateTime $expires, array $scopes = array())
+    public function __construct($access_token, $client_id, $user_id = null, array $scopes = array())
     {
-        $this->type = ($user_id === NULL) ? 'client' : 'user' ;
         $this->user_id = $user_id;
-        $this->password = $client_id;
+        $this->client_id = $client_id;
         $this->scopes = $scopes;
-        $this->expires = $expires;
         $this->access_token = $access_token;
     }
 
@@ -35,17 +31,17 @@ class OAuth2User implements UserInterface, EquatableInterface
 
     public function getPassword()
     {
-        return NULL;
+        return null;
     }
 
     public function getSalt()
     {
-        return NULL;
+        return null;
     }
 
     public function getUsername()
     {
-        if ($this->user_id !== NULL) {
+        if (!empty($this->user_id)) {
             return $this->user_id;
         }
         else {
@@ -68,14 +64,10 @@ class OAuth2User implements UserInterface, EquatableInterface
         return $this->scopes;
     }
 
-    public function getExpires()
+    public function isUser()
     {
-        return $this->expires;
-    }
-
-    public function getType()
-    {
-        return $this->type;
+        if (!empty($this->user_id)) return true;
+        return false;
     }
 
     public function getAccessToken()
@@ -85,12 +77,17 @@ class OAuth2User implements UserInterface, EquatableInterface
 
     public function eraseCredentials()
     {
-        $this->access_token = NULL;
+        // Nothing sensitive held 
+        // Do nothing
     }
 
     public function isEqualTo(UserInterface $user)
     {
         if (!$user instanceof OAuth2User) {
+            return false;
+        }
+
+        if ($this->access_token !== $user->getAccessToken()) {
             return false;
         }
 

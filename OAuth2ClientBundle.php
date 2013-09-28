@@ -4,6 +4,7 @@ namespace OAuth2\ClientBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use OAuth2\ClientBundle\DependencyInjection\Security\Factory\OAuth2Factory;
+use OAuth2\ClientBundle\DependencyInjection\Security\Factory\OAuth2AuthCodeFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OAuth2ClientBundle extends Bundle

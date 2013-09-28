@@ -10,11 +10,11 @@ use Guzzle\Http\Client;
 
 class OAuth2UserProvider implements UserProviderInterface
 {
-    private $verify_endpoint;
+    private $serverVerifyUri;
 
-    public function __construct($verify_endpoint)
+    public function __construct($oauth2_server)
     {
-        $this->verify_endpoint = $verify_endpoint;
+        $this->serverVerifyUri = $oauth2_server['verify_uri'];
     }
 
     public function loadUserByUsername($username)
@@ -27,7 +27,7 @@ class OAuth2UserProvider implements UserProviderInterface
         // Verify Access Token and get details back
         $client = new Client();
         $request = $client->get(
-            $this->verify_endpoint,
+            $this->serverVerifyUri,
             array(
                 'Authorization' => 'Bearer ' . $access_token
             ),
@@ -47,7 +47,7 @@ class OAuth2UserProvider implements UserProviderInterface
         }
 
         if ($userData) {
-            return new OAuth2User($access_token, $userData['client_id'], $userData['user_id'], new \DateTime('@' . $userData['expires']), explode(' ', $userData['scope']));
+            return new OAuth2User($access_token, $userData['client_id'], $userData['user_id'], explode(' ', $userData['scope']));
         }
 
         throw new UsernameNotFoundException(sprintf('User for Access Token "%s" does not exist or is invalid.', $access_token));

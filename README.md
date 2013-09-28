@@ -4,7 +4,7 @@ OAuth2 Client Bundle for Symfony 2.
 
 ## Overview
 
-Allow for the protection of resources via OAuth2. Currently only supports Bearer Access Tokens. The access tokens can be provided via a header (recommended) or query e.g. `Authorization: Bearer {Access Token}` or `http://example.com/resource?access_token={Access Token}`.
+Allow for the protection of resources via OAuth2. Provides a Symfony Firewall for basic Bearer Access Tokens for securing APIs or the Authorization Code grant type for securing application. The access tokens can be provided via a header (recommended) or query e.g. `Authorization: Bearer {Access Token}` or `http://example.com/resource?access_token={Access Token}`.
 
 ## Installation
 
@@ -47,26 +47,31 @@ public function registerBundles()
 
 ### Step 3: Add parameters
 
-You'll need to two parameters to your parameters.yml
+You'll need add your OAuth2 Server URIs as parameters to your `parameters.yml`
 
 ``` yaml
 # app/config/parameters.yml
 
 parameters:
-    oauth2.client.server.verify_endpoint: 'https://example.com/verify'
+    oauth2.client.server:
+        authorize_uri: 'http://example.com/authorize'
+        token_uri: 'https://example.com/token'
+        verify_uri: 'https://example.com/verify-token'
 ```
 
-The verify path should verify the access token on your OAuth2 Server and provide a JSON encoded array of:
+The verify uri should verify the access token on your OAuth2 Server and provide a JSON encoded array of:
 
-- Access Token
-- Client ID
-- Expires (Unix Timestamp)
-- User ID (Optional)
-- Scope (Optional)
+- `access_token`
+- `client_id`
+- `expires_in`
+- `user_id` (Optional)
+- `scope` (Optional)
 
-### Step 4: Configure security
+### Step 4a: Configure security (access token only)
 
-You'll need to setup a firewall in your security.yml
+Access token only firewall is most often used for securing APIs where the end user won't actually be interacting with your Symfony application directly.
+
+You'll need to setup a firewall in your `security.yml`
 
 ``` yaml
 # app/config/security.yml
@@ -81,9 +86,59 @@ security:
 
     firewalls:
         oauth2_secured:
-            pattern:    ^/*
-            stateless:  true
-            oauth2:     true
+            pattern: ^/secured_area/
+            oauth2:
+                client_id: ~
+                client_secret: ~
+                scope: basic
+                redirect_uri: http://www.example.com/secured_area/
+                authorization_code: false
+```
+
+The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well like `use_referer` and `default_target_path`.
+
+### Step 4b: Configure security (Authorization code with access token fallback)
+
+Authorization code firewall is most often used when the end user is interacting with your Symfony application.
+
+You'll need to setup a firewall in your `security.yml`
+
+``` yaml
+# app/config/security.yml
+
+security:
+    encoders:
+        OAuth2\ClientBundle\Security\User\OAuth2User: plaintext
+
+    providers:
+        oauth2_client:
+            id: oauth2.client.user_provider
+
+    firewalls:
+        oauth2_secured:
+            pattern: ^/secured_area/
+            oauth2:
+                client_id: ~
+                client_secret: ~
+                redirect_uri: http://www.example.com/secured_area/authorized
+                scope: basic
+                authorization_code: true
+```
+
+The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well like `use_referer` and `default_target_path`.
+
+## The OAuth2Token
+
+The client bundle will provide an `OAuth2Token` object for any secured path in your controllers.
+
+There are additional getters available on the `OAuth2User` object:
+
+``` php
+$token = $this->get('security.context)->getToken();
+$token->getAccessToken(); // The access token
+$token->getRefreshToken(); // The refresh token
+$token->getExpiresAt(); // Expiry datetime object
+$token->getExpiresIn(); // Seconds until the access token expires
 ```
 
 ## The OAuth2User
@@ -98,8 +153,8 @@ There are additional getters available on the `OAuth2User` object:
 $user = $this->getUser();
 $user->getClientId(); // Client ID
 $user->getUserId(); // User ID
-$user->getType(); // Client or User
-$user->getUsername(); // Client ID if type Client, or UserID if type User
+$user->isUser(); // True if user, false if client only
+$user->getUsername(); // Client ID if client only, or User ID if user
 $user->getScopes(); // Array of scopes
-$user->getExpires(); // Expiry datetime object
+$user->getAccessToken(); // The access token
 ```
