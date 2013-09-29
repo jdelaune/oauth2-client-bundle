@@ -2,13 +2,13 @@
 
 namespace OAuth2\ClientBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
-class OAuth2Factory extends AbstractFactory
+class OAuth2AuthorizationCodeFactory extends AbstractFactory
 {
     public function getPosition()
     {
@@ -17,7 +17,7 @@ class OAuth2Factory extends AbstractFactory
 
     public function getKey()
     {
-        return 'oauth2';
+        return 'oauth2_authorization_code';
     }
 
     public function addConfiguration(NodeDefinition $node)
@@ -28,17 +28,9 @@ class OAuth2Factory extends AbstractFactory
             ->children()
                 ->scalarNode('client_id')->defaultValue('')->end()
                 ->scalarNode('client_secret')->defaultValue('')->end()
-                ->scalarNode('authorized_redirect_uri')->defaultValue('https://www.example.com/authorized')->end()
-                ->scalarNode('scope')->defaultValue('basic')->end()
                 ->scalarNode('redirect_uri')->defaultValue('http://www.example.com')->end()
-                ->scalarNode('client_id')->defaultValue('')->end()
-                ->booleanNode('authorization_code')->defaultTrue()->end()
+                ->scalarNode('scope')->defaultValue('basic')->end()
             ->end();
-    }
-
-    protected function getListenerId()
-    {
-        return 'oauth2.client.security.authentication.listener';
     }
 
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
@@ -50,6 +42,11 @@ class OAuth2Factory extends AbstractFactory
         ;
 
         return $providerId;
+    }
+
+    protected function getListenerId()
+    {
+        return 'oauth2.client.security.authentication.authorization_code_listener';
     }
 
     protected function createListener($container, $id, $config, $userProvider)
@@ -65,16 +62,9 @@ class OAuth2Factory extends AbstractFactory
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
-        if ($config['authorization_code'] === FALSE) {
-            $entryPointService = 'oauth2.client.security.entry_point.access_token_entry_point';
-        }
-        else {
-            $entryPointService = 'oauth2.client.security.entry_point.authorization_code_entry_point';
-        }
-
         $entryPointId = 'security.authentication.entry_point.oauth2.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator($entryPointService))
+            ->setDefinition($entryPointId, new DefinitionDecorator('oauth2.client.security.entry_point.authorization_code_entry_point'))
             ->replaceArgument(1, $config);
 
         return $entryPointId;

@@ -9,10 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OAuth2AccessTokenEntryPoint implements AuthenticationEntryPointInterface
 {
-    public function __construct(array $oauth2_server, array $oauth2_client)
-    {
-    }
-
     /**
      * Starts the authentication scheme.
      *

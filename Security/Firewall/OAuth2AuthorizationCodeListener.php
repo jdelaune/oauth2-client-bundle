@@ -2,18 +2,13 @@
 
 namespace OAuth2\ClientBundle\Security\Firewall;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use OAuth2\ClientBundle\Security\Authentication\Token\OAuth2Token;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Guzzle\Http\Client;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use OAuth2\ClientBundle\Security\Authentication\Token\OAuth2Token;
 
-class OAuth2Listener extends AbstractAuthenticationListener
+class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
 {
     protected $serverAuthorizeUri;
     protected $serverTokenUri;
@@ -52,22 +47,7 @@ class OAuth2Listener extends AbstractAuthenticationListener
      */
     protected function attemptAuthentication(Request $request)
     {
-        // Look for an access token
-        $authHeader = preg_split('/[\s]+/', $request->headers->get('Authorization'));
-        $access_token = isset($authHeader[1]) ? $authHeader[1] : $request->get('access_token');
-
-        if (!empty($access_token)) {
-            $token = new OAuth2Token();
-            $token->setAccessToken($access_token);
-
-            $authToken = $this->authenticationManager->authenticate($token);
-            
-            if (isset($authToken)) return $authToken;
-        }
-
-        if (!$this->allowAuthorizationCode) return null;
-        
-        // Otherwise Look for an authorization code
+        // Look for an authorization code
         if($request->query->has('code')) {
             $session = $request->getSession();
             // Do with have an authorization code instead?

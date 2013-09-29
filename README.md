@@ -4,7 +4,7 @@ OAuth2 Client Bundle for Symfony 2.
 
 ## Overview
 
-Allow for the protection of resources via OAuth2. Provides a Symfony Firewall for basic Bearer Access Tokens for securing APIs or the Authorization Code grant type for securing application. The access tokens can be provided via a header (recommended) or query e.g. `Authorization: Bearer {Access Token}` or `http://example.com/resource?access_token={Access Token}`.
+Allow for the protection of resources via OAuth2. Provides two Symfony firewalls. One for checking bearer access tokens for securing API application. The access tokens can be provided via a header (recommended) or query e.g. `Authorization: Bearer {Access Token}` or `http://example.com/resource?access_token={Access Token}`. The other firewall is for securing web applications via the authorization code grant type.
 
 ## Installation
 
@@ -67,7 +67,7 @@ The verify uri should verify the access token on your OAuth2 Server and provide 
 - `user_id` (Optional)
 - `scope` (Optional)
 
-### Step 4a: Configure security (access token only)
+### Step 4a: Configure security (access token)
 
 Access token only firewall is most often used for securing APIs where the end user won't actually be interacting with your Symfony application directly.
 
@@ -87,17 +87,11 @@ security:
     firewalls:
         oauth2_secured:
             pattern: ^/secured_area/
-            oauth2:
-                client_id: ~
-                client_secret: ~
-                scope: basic
-                redirect_uri: http://www.example.com/secured_area/
-                authorization_code: false
+            oauth2_access_token: true
+            stateless: true
 ```
 
-The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well like `use_referer` and `default_target_path`.
-
-### Step 4b: Configure security (Authorization code with access token fallback)
+### Step 4b: Configure security (authorization code)
 
 Authorization code firewall is most often used when the end user is interacting with your Symfony application.
 
@@ -117,15 +111,14 @@ security:
     firewalls:
         oauth2_secured:
             pattern: ^/secured_area/
-            oauth2:
+            oauth2_authorization_code:
                 client_id: ~
                 client_secret: ~
                 redirect_uri: http://www.example.com/secured_area/authorized
                 scope: basic
-                authorization_code: true
 ```
 
-The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well like `use_referer` and `default_target_path`.
+The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well that one would use for the form firewall like `use_referer` and `default_target_path`.
 
 ## The OAuth2Token
 
@@ -134,7 +127,7 @@ The client bundle will provide an `OAuth2Token` object for any secured path in y
 There are additional getters available on the `OAuth2User` object:
 
 ``` php
-$token = $this->get('security.context')->getToken();
+$token = $this->get('security.context)->getToken();
 $token->getAccessToken(); // The access token
 $token->getRefreshToken(); // The refresh token
 $token->getExpiresAt(); // Expiry datetime object
