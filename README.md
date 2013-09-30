@@ -128,7 +128,7 @@ The client bundle will provide an `OAuth2Token` object for any secured path in y
 There are additional getters available on the `OAuth2User` object:
 
 ``` php
-$token = $this->get('security.context)->getToken();
+$token = $this->get('security.context')->getToken();
 $token->getAccessToken(); // The access token
 $token->getRefreshToken(); // The refresh token
 $token->getExpiresAt(); // Expiry datetime object
