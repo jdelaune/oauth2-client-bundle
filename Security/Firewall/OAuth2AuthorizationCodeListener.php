@@ -16,12 +16,13 @@ class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
     protected $clientSecret;
     protected $redirectUri;
     protected $scope;
-    protected $allowAuthorizationCode;
+    protected $validateSSL;
 
     public function setServer(array $oauth2_server)
     {
         $this->serverAuthorizeUri = $oauth2_server['authorize_uri'];
         $this->serverTokenUri = $oauth2_server['token_uri'];
+        $this->validateSSL = $oauth2_server['validate_ssl'];
     }
     
     public function setClient(array $oauth2_client)
@@ -30,8 +31,6 @@ class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
         $this->clientSecret = $oauth2_client['client_secret'];
         $this->redirectUri = $oauth2_client['redirect_uri'];
         $this->scope = $oauth2_client['scope'];
-        $this->allowAuthorizationCode = true;
-        if (isset($oauth2_client['authorization_code']) && $oauth2_client['authorization_code'] === false) $this->allowAuthorizationCode = false;
     }
 
     /**
@@ -57,6 +56,9 @@ class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
                 $tokenData = array();
 
                 $client = new Client();
+                if ($this->validateSSL === false) {
+                    $client = new Client(null, 'ssl.certificate_authority' => FALSE);
+                }
                 $api_request = $client->post(
                     $this->serverTokenUri,
                     array(),

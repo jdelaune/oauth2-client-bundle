@@ -57,6 +57,7 @@ parameters:
         authorize_uri: 'http://example.com/authorize'
         token_uri: 'https://example.com/token'
         verify_uri: 'https://example.com/verify-token'
+        validate_ssl: true
 ```
 
 The verify uri should verify the access token on your OAuth2 Server and provide a JSON encoded array of:

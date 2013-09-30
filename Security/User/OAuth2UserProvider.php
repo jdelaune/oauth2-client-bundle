@@ -10,11 +10,13 @@ use Guzzle\Http\Client;
 
 class OAuth2UserProvider implements UserProviderInterface
 {
-    private $serverVerifyUri;
+    protected $serverVerifyUri;
+    protected $validateSSL;
 
     public function __construct($oauth2_server)
     {
         $this->serverVerifyUri = $oauth2_server['verify_uri'];
+        $this->validateSSL = $oauth2_server['validate_ssl'];
     }
 
     public function loadUserByUsername($username)
@@ -26,6 +28,9 @@ class OAuth2UserProvider implements UserProviderInterface
     {
         // Verify Access Token and get details back
         $client = new Client();
+        if ($this->validateSSL === false) {
+            $client = new Client(null, 'ssl.certificate_authority' => FALSE);
+        }
         $request = $client->get(
             $this->serverVerifyUri,
             array(
