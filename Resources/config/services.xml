@@ -11,6 +11,7 @@
             <parameter key="verify_uri">https://www.example.com/verify</parameter>
             <parameter key="authorize_uri">https://www.example.com/authorize</parameter>
             <parameter key="token_uri">https://www.example.com/token</parameter>
+            <parameter key="validate_ssl">true</parameter>
         </parameter>
     </parameters>
     <services>
