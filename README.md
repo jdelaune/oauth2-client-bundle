@@ -121,6 +121,19 @@ security:
 
 The `redirect_uri` needs to be a URI behind the same firewall. You can use all the usual configuration options here as well that one would use for the form firewall like `use_referer` and `default_target_path`.
 
+### Step 5: Add routing
+
+We provide default routing for some paths needed when using the authorization code firewall. Add this to your `routing.yml`
+
+``` yaml
+# app/config/routing.yml
+
+oauth2_client:
+    resource: "@OAuth2ClientBundle/Controller/"
+    type:     annotation
+    prefix:   /
+```
+
 ## The OAuth2Token
 
 The client bundle will provide an `OAuth2Token` object for any secured path in your controllers.

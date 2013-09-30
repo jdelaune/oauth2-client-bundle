@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 class AuthorizedController extends Controller
 {
     /**
-     * @Route("/authorized", name="oauth2_client_authorized")
+     * @Route("/authorized", name="_authorized")
      * @Method({"GET"})
      */
     public function authorizedAction()
