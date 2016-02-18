@@ -30,7 +30,7 @@
         </service>
 
         <service id="oauth2.client.security.authentication.access_token_listener" class="%oauth2.client.security.authentication.access_token_listener.class%">
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.manager" />
         </service>
 

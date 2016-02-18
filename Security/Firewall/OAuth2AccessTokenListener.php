@@ -2,8 +2,8 @@
 
 namespace OAuth2\ClientBundle\Security\Firewall;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use OAuth2\ClientBundle\Security\Authentication\Token\OAuth2Token;
@@ -11,12 +11,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OAuth2AccessTokenListener implements ListenerInterface
 {
-    protected $securityContext;
+    /**
+     * @var TokenStorageInterface
+     */
+    protected $tokenStorage;
+
+    /**
+     * @var AuthenticationManagerInterface
+     */
     protected $authenticationManager;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
     }
 
@@ -36,7 +43,7 @@ class OAuth2AccessTokenListener implements ListenerInterface
             $token->setAccessToken($access_token);
 
             $authToken = $this->authenticationManager->authenticate($token);
-            $this->securityContext->setToken($authToken);
+            $this->tokenStorage->setToken($authToken);
             return;
         }
 
