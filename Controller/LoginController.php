@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 class LoginController extends Controller
 {
     /**
-     * @Route("/login", name="_logout")
+     * @Route("/login", name="_login")
      * @Method({"GET"})
      */
     public function loginAction()
