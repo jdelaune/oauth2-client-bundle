@@ -53,29 +53,29 @@ class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
             // and do the states match?
             if ($session->get('state') == $request->query->get('state')) {
                 // Swap authorization code for access token
-                $tokenData = array();
+                $tokenData = [];
 
-                $client = new Client(
-                    [
-                        'timeout' => 2,
-                        'connect_timeout' => 2,
-                    ]
-                );
+                $client = new Client([
+                    'timeout' => 2,
+                    'connect_timeout' => 2,
+                ]);
                 if ($this->validateSSL === false) {
                     $client = new Client(['ssl.certificate_authority' => FALSE]);
                 }
-                $response = $client->post(
-                    $this->serverTokenUri,
-                    array(
+                $request = new \GuzzleHttp\Psr7\Request('POST', $this->serverTokenUri, [
+                    'Content-Type' => 'application/x-www-form-urlencoded'
+                ],
+                    http_build_query([
                         'grant_type' => 'authorization_code',
                         'code' => $request->query->get('code'),
                         'client_id' => $this->clientId,
                         'client_secret' => $this->clientSecret,
                         'redirect_uri' => $this->redirectUri,
-                    )
+                    ])
                 );
 
                 try {
+                    $response = $client->send($request);
                     $tokenData = json_decode($response->getBody()->getContents(), true);
                 }
                 catch(\Exception $e)
