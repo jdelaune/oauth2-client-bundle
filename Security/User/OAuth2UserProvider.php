@@ -29,7 +29,7 @@ class OAuth2UserProvider implements UserProviderInterface
         // Verify Access Token and get details back
         $client = new Client();
         if ($this->validateSSL === false) {
-            $client = new Client(null, ['ssl.certificate_authority' => false]);
+            $client = new Client(['ssl.certificate_authority' => false]);
         }
         $response = $client->get(
             $this->serverVerifyUri,
