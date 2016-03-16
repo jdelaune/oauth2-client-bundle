@@ -4,7 +4,7 @@ namespace OAuth2\ClientBundle\Security\Firewall;
 
 use Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
 use Symfony\Component\HttpFoundation\Request;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use OAuth2\ClientBundle\Security\Authentication\Token\OAuth2Token;
 
@@ -55,29 +55,28 @@ class OAuth2AuthorizationCodeListener extends AbstractAuthenticationListener
                 // Swap authorization code for access token
                 $tokenData = array();
 
-                $client = new Client();
+                $client = new Client(
+                    [
+                        'timeout' => 2,
+                        'connect_timeout' => 2,
+                    ]
+                );
                 if ($this->validateSSL === false) {
                     $client = new Client(null, array('ssl.certificate_authority' => FALSE));
                 }
-                $api_request = $client->post(
+                $response = $client->post(
                     $this->serverTokenUri,
-                    array(),
                     array(
                         'grant_type' => 'authorization_code',
                         'code' => $request->query->get('code'),
                         'client_id' => $this->clientId,
                         'client_secret' => $this->clientSecret,
                         'redirect_uri' => $this->redirectUri,
-                    ),
-                    array(
-                        'timeout' => 2,
-                        'connect_timeout' => 2,
                     )
                 );
 
                 try {
-                    $response = $api_request->send();
-                    $tokenData = $response->json();
+                    $tokenData = json_decode($response->getBody()->getContents(), true);
                 }
                 catch(\Exception $e)
                 {

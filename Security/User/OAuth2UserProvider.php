@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 class OAuth2UserProvider implements UserProviderInterface
 {
@@ -29,22 +29,19 @@ class OAuth2UserProvider implements UserProviderInterface
         // Verify Access Token and get details back
         $client = new Client();
         if ($this->validateSSL === false) {
-            $client = new Client(null, array('ssl.certificate_authority' => FALSE));
+            $client = new Client(null, ['ssl.certificate_authority' => false]);
         }
-        $request = $client->get(
+        $response = $client->get(
             $this->serverVerifyUri,
-            array(
-                'Authorization' => 'Bearer ' . $access_token
-            ),
-            array(
+            [
+                'headers' => ['Authorization' => 'Bearer ' . $access_token],
                 'timeout' => 2,
                 'connect_timeout' => 2,
-            )
+            ]
         );
 
         try {
-            $response = $request->send();
-            $userData = $response->json();
+            $userData = json_decode($response->getBody()->getContents(), true);
         }
         catch(\Exception $e)
         {
