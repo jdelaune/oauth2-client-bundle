@@ -1,6 +1,6 @@
 # OAuth2 Client Bundle
 
-OAuth2 Client Bundle for Symfony 2.
+OAuth2 Client Bundle for Symfony 2/3.
 
 ## Overview
 
@@ -15,7 +15,7 @@ Add the bundle to your composer.json:
 ``` js
 {
     "require": {
-        "jdelaune/oauth2-client-bundle": "dev-master"
+        "jdelaune/oauth2-client-bundle": "~3.0"
     }
 }
 ```
