@@ -15,7 +15,7 @@ Add the bundle to your composer.json:
 ``` js
 {
     "require": {
-        "jdelaune/oauth2-client-bundle": "~3.0"
+        "jdelaune/oauth2-client-bundle": "^4.0"
     }
 }
 ```
