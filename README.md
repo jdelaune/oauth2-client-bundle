@@ -1,6 +1,6 @@
 # OAuth2 Client Bundle
 
-OAuth2 Client Bundle for Symfony 2/3.
+OAuth2 Client Bundle for Symfony 2-4.
 
 ## Overview
 
