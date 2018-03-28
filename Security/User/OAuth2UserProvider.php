@@ -34,7 +34,10 @@ class OAuth2UserProvider implements UserProviderInterface
         $response = $client->get(
             $this->serverVerifyUri,
             [
-                'headers' => ['Authorization' => 'Bearer ' . $access_token],
+                'headers' => [
+					'Authorization' => 'Bearer ' . $access_token,
+					'Accept' => 'application/json, text/plain, */*'
+				],
                 'timeout' => 2,
                 'connect_timeout' => 2,
             ]
