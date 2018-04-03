@@ -2,6 +2,7 @@
 
 namespace OAuth2\ClientBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -23,7 +24,7 @@ class OAuth2AccessTokenFactory extends AbstractFactory
     {
         $providerId = 'security.authentication.provider.oauth2.'.$id;
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('oauth2.client.security.authentication.provider'))
+            ->setDefinition($providerId, new ChildDefinition('oauth2.client.security.authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId));
         ;
 
@@ -39,7 +40,7 @@ class OAuth2AccessTokenFactory extends AbstractFactory
     {
         $listenerId = 'security.authentication.listener.oauth2.'.$id;
         $container
-            ->setDefinition($listenerId, new DefinitionDecorator('oauth2.client.security.authentication.access_token_listener'));
+            ->setDefinition($listenerId, new ChildDefinition('oauth2.client.security.authentication.access_token_listener'));
 
         return $listenerId;
     }
@@ -48,7 +49,7 @@ class OAuth2AccessTokenFactory extends AbstractFactory
     {
         $entryPointId = 'security.authentication.entry_point.oauth2.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('oauth2.client.security.entry_point.access_token_entry_point'));
+            ->setDefinition($entryPointId, new ChildDefinition('oauth2.client.security.entry_point.access_token_entry_point'));
 
         return $entryPointId;
     }
