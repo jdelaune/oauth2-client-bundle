@@ -2,6 +2,7 @@
 
 namespace OAuth2\ClientBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -37,7 +38,7 @@ class OAuth2AuthorizationCodeFactory extends AbstractFactory
     {
         $providerId = 'security.authentication.provider.oauth2.'.$id;
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('oauth2.client.security.authentication.provider'))
+            ->setDefinition($providerId, new ChildDefinition('oauth2.client.security.authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId));
         ;
 
@@ -64,7 +65,7 @@ class OAuth2AuthorizationCodeFactory extends AbstractFactory
     {
         $entryPointId = 'security.authentication.entry_point.oauth2.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('oauth2.client.security.entry_point.authorization_code_entry_point'))
+            ->setDefinition($entryPointId, new ChildDefinition('oauth2.client.security.entry_point.authorization_code_entry_point'))
             ->replaceArgument(1, $config);
 
         return $entryPointId;
