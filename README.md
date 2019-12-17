@@ -1,6 +1,6 @@
 # OAuth2 Client Bundle
 
-OAuth2 Client Bundle for Symfony 2-4.
+OAuth2 Client Bundle for Symfony 2-5.
 
 ## Overview
 
@@ -15,7 +15,7 @@ Add the bundle to your composer.json:
 ``` js
 {
     "require": {
-        "jdelaune/oauth2-client-bundle": "^4.0"
+        "jdelaune/oauth2-client-bundle": "^5.0"
     }
 }
 ```
